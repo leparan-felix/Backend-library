@@ -1,13 +1,14 @@
 from flask import Flask
-from app.config import Config
-from app.extensions import db, jwt, migrate
-from app.routes import register_routes
+from .extensions import db, jwt, migrate
+from .models import book, user  # 👈 Make sure all models are imported
 
 def create_app():
     app = Flask(__name__)
-    app.config.from_object(Config)
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///library.db'
+    app.config['JWT_SECRET_KEY'] = 'super-secret'  # Change in production
+
     db.init_app(app)
     jwt.init_app(app)
-    migrate.init_app(app, db)
-    register_routes(app)
+    migrate.init_app(app, db)  # ✅ Migrate setup
+
     return app
