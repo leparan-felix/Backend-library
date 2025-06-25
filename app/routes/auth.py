@@ -1,31 +1,32 @@
 from flask import Blueprint, request, jsonify
-from app.models.user import User
-from app.extensions import db
-from flask_jwt_extended import create_access_token
-from app.utils.validators import validate_register_data, validate_login_data
 
 auth_bp = Blueprint('auth', __name__)
 
-@auth_bp.route('/register', methods=['POST'])
-def register():
-    data = request.get_json()
-    error = validate_register_data(data)
-    if error: return jsonify({"error": error}), 400
-    if User.query.filter_by(email=data["email"]).first():
-        return jsonify({"error": "Email already exists"}), 409
-    user = User(username=data["username"], email=data["email"])
-    user.set_password(data["password"])
-    db.session.add(user)
-    db.session.commit()
-    return jsonify({"message": "User registered"}), 201
-
 @auth_bp.route('/login', methods=['POST'])
 def login():
-    data = request.get_json()
-    error = validate_login_data(data)
-    if error: return jsonify({"error": error}), 400
-    user = User.query.filter_by(email=data["email"]).first()
-    if not user or not user.check_password(data["password"]):
-        return jsonify({"error": "Invalid credentials"}), 401
-    access_token = create_access_token(identity=user.id)
-    return jsonify(access_token=access_token), 200
+    try:
+        data = request.get_json(force=True)
+        print("DEBUG: Received data:", data)
+
+        if not data:
+            return jsonify({"error": "Missing JSON body"}), 400
+
+        email = data.get("email") or data.get("username")
+        password = data.get("password")
+
+        if not email or not password:
+            return jsonify({"error": "Email and password required"}), 400
+
+        # For testing purposes only — hardcoded admin
+        if email != "admin@example.com" or password != "admin123":
+            return jsonify({"error": "Invalid credentials"}), 401
+
+        return jsonify({
+            "username": "admin",
+            "submitted_email": email,
+            "submitted_password": password
+        }), 200
+
+    except Exception as e:
+        print("ERROR:", e)
+        return jsonify({"error": str(e)}), 500
