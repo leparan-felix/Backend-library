@@ -1,13 +1,23 @@
 from flask import Flask
-from app.config import Config
-from app.extensions import db, jwt, migrate
-from app.routes import register_routes
+from app.extensions import db, migrate
+from app.models import user, book
+from app.routes.books import books_bp
+from app.routes.auth import auth_bp
+from flask_jwt_extended import JWTManager
+
 
 def create_app():
     app = Flask(__name__)
-    app.config.from_object(Config)
+
+    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///library.db"
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    app.config["JWT_SECRET_KEY"] = "super-secret"  # Change in production
+
     db.init_app(app)
-    jwt.init_app(app)
     migrate.init_app(app, db)
-    register_routes(app)
+    JWTManager(app)
+
+    app.register_blueprint(books_bp, url_prefix='/api')
+    app.register_blueprint(auth_bp, url_prefix='/api')
+
     return app
