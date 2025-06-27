@@ -1,12 +1,21 @@
-from app import create_app
-from routes.books import books_bp # type: ignore
-from routes.auth import auth_bp  # type: ignore # if using auth
+# app.py
+
+<<<<<<< HEAD
+from flask import Flask
+from app.routes.auth import auth_bp
+
+def create_app():
+    app = Flask(__name__)
+
+    # Register blueprint with `/api` prefix
+    app.register_blueprint(auth_bp, url_prefix='/api')
+
+    return app
+=======
 
 app = create_app()
 
-# ✅ Register blueprints *after* creating app
-app.register_blueprint(books_bp, url_prefix='/api')
-app.register_blueprint(auth_bp, url_prefix='/api')  # if you have this
-
 if __name__ == '__main__':
     app.run(debug=True)
+
+>>>>>>> af767733514901972120d625d3d136c04e03d8a4
