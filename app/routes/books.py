@@ -5,7 +5,8 @@ from app.extensions import db
 
 books_bp = Blueprint('books', __name__)
 
-# GET /books (already defined above)
+# 🔹 CREATE Book
+
 
 @books_bp.route('/books', methods=['POST'])
 @jwt_required()
@@ -34,6 +35,29 @@ def create_book():
         "read": new_book.read
     }), 201
 
+# 🔹 READ all books (only for current user)
+
+
+@books_bp.route('/books', methods=['GET'])
+@jwt_required()
+def get_books():
+    user_id = get_jwt_identity()
+    books = Book.query.filter_by(user_id=user_id).all()
+
+    result = []
+    for book in books:
+        result.append({
+            "id": book.id,
+            "title": book.title,
+            "author": book.author,
+            "description": book.description,
+            "read": book.read
+        })
+
+    return jsonify(result), 200
+
+# 🔹 UPDATE Book
+
 
 @books_bp.route('/books/<int:id>', methods=['PUT'])
 @jwt_required()
@@ -42,7 +66,6 @@ def update_book(id):
     user_id = get_jwt_identity()
 
     book = Book.query.get_or_404(id)
-
     if book.user_id != user_id:
         return jsonify({"error": "Unauthorized"}), 403
 
@@ -63,6 +86,8 @@ def update_book(id):
             "read": book.read
         }
     }), 200
+
+# 🔹 DELETE Book
 
 
 @books_bp.route('/books/<int:id>', methods=['DELETE'])
