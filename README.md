@@ -165,13 +165,6 @@ This API powers the frontend at:
 👉 https://library-app-ecmu.vercel.app
 📄 License
 
-MIT License
-🧑‍💻 Maintainer
 
-Sopia
-
-    GitHub: @yourusername
-
-Would you like this README saved to a file or included in your project automatically? I can also generate the .env, Dockerfile, or example route files (auth.py, items.py, etc.).
 
 
